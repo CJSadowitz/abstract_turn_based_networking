@@ -48,7 +48,7 @@ class Client:
 
 	# receive game state from server
 	def receive_action(self, client):
-		client.settimeout(self.timeout)
+		client.settimeout(self.timeout) # Consider moving this for efficiency?
 		try:
 			client.recv(4096)
 		except socket.timeout:
