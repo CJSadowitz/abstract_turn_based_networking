@@ -20,3 +20,9 @@ Functions:
 - Receive turn permission
 - Join lobby
 </br>
+### Setup
+Import Modules: `from Server import Server` and `from Client import Client`
+### Functions
+Server is a class that you create an object of to run:
+Constructor: `server = Server()`
+
