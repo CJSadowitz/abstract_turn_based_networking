@@ -22,6 +22,7 @@ class Server:
 
 		self.active = False
 		self.respone = None
+		self.game_state_func = None
 
 	# main loop
 	def create_lobby(self, player_count): # Find a way to ensure that only the player_count can join
@@ -49,6 +50,7 @@ class Server:
 
 		server.close()
 
+	# Get the information return validity of received information
 	def receive_action(self, conn):
 		json = None
 		json = conn.recv(4096) # do time out
@@ -56,22 +58,19 @@ class Server:
 			for rule in self.rules:
 				if (self.verify_action(rule, json) == False):
 					return False
+			# make message
+			self.make_game_state(json)
 			return True
 		return False
 
 	# Rule will be a function that the json will be fed into
 	def verify_action(self, rule, json):
-		pass
+		return rule(json)
 
+	# send message to all connections
 	def relay_action(self):
 		for conn in self.connections:
 			conn.send(self.response)
-
-	# Rule is a function that somehow determines the next players turn
-	def send_turn_permission(self, rule):
-		pass
-
-	# CORE FUNCTIONALITY ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	# Allow server shutdown
 	def set_server_activity(switch):
@@ -94,6 +93,15 @@ class Server:
 	# allow for custom rules to be added for verify_action()
 	def add_rule(self, func):
 		self.rules.append(func)
+
+	def make_game_state(self, json):
+		if self.game_state_func == None:
+			self.response = json
+		else:
+			self.response = self.game_state_func(json)
+
+	def convert_game_state_func(func)
+		self.game_state_func = func
 
 
 if __name__ == "__main__":
