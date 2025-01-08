@@ -30,12 +30,12 @@ class Server:
 
 		try:
 			server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		except socket.error as e:
+		except socket.error as e: # add a throw
 			print ("Socket creation failed: " + str(e))
 			return
 		try:
 			server.bind((self.ip, self.port))
-		except socket.error as e:
+		except socket.error as e: # add a throw
 			print ("Failed to bind socket: " + str(e))
 			return
 
@@ -48,11 +48,10 @@ class Server:
 				self.connections.append(conn)
 				client_thread = threading.Thread(target=self.handle_client, args=(addr, conn))
 				client_thread.start()
-			except socket.error as e:
-				print ("Passed server.accept()")
+			except socket.error as e: # add a throw
+				pass
 
 		server.close()
-		print ("Closed Server")
 		client_thread.join()
 
 	# Get the information return validity of received information
@@ -62,8 +61,8 @@ class Server:
 		conn.settimeout(self.timeout)
 		try:
 			json = conn.recv(4096)
-		except socket.timeout:
-			print ("Server Timed out")
+		except socket.timeout: # add throw
+			pass
 		except KeyboardInterrupt:
 			conn.close()
 		if (json != None):
@@ -101,7 +100,6 @@ class Server:
 
 		self.connections.remove(conn)
 		conn.close()
-		print ("Handle Client Closed Connection")
 
 	# allow for custom rules to be added for verify_action()
 	def add_rule(self, func):

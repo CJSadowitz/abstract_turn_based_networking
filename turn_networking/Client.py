@@ -21,11 +21,11 @@ class Client:
 	def join_lobby(self, ip="127.0.0.1", port=53850):
 		try:
 			client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		except socket.error as e:
+		except socket.error as e: # add a throw here too?
 			print ("Failed to create socket: " + str(e))
 		try:
 			client.connect((ip, port))
-		except Exception as e:
+		except Exception as e: # add a throw here too?
 			print ("Failed to make connection with " + ip + " :" + str(e))
 
 		self.active = True
@@ -35,10 +35,8 @@ class Client:
 				client.send(self.message.encode())
 				self.message = None
 			self.receive_action(client)
-			print ("Is Active")
 
 		client.close()
-		print ("Client Closed")
 
 	# returns all discovered ip's broadcasting information
 	def discover_lobbies(self):
@@ -54,7 +52,7 @@ class Client:
 		try:
 			client.recv(4096)
 		except socket.timeout:
-			print ("Client Timed out")
+			pass # Maybe change this to a throw such that the user can handle this?
 		except KeyboardInterrupt:
 			client.close()
 
