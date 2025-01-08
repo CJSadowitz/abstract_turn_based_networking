@@ -35,6 +35,7 @@ class Client:
 				client.send(self.message.encode())
 				self.message = None
 			self.receive_action(client)
+			print ("Is Active")
 
 		client.close()
 		print ("Client Closed")
@@ -53,7 +54,7 @@ class Client:
 		try:
 			client.recv(4096)
 		except socket.timeout:
-			print ("Timed out")
+			print ("Client Timed out")
 		except KeyboardInterrupt:
 			client.close()
 
@@ -64,8 +65,8 @@ class Client:
 	def get_game_state(self):
 		return self.game_state
 
-	def set_active_status(self, state):
-		self.active = state
+	def shutdown(self):
+		self.active = False
 
 if __name__ == "__main__":
 	pass

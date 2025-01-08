@@ -39,15 +39,21 @@ class Server:
 			print ("Failed to bind socket: " + str(e))
 			return
 
+		server.settimeout(self.timeout)
 		server.listen()
 
 		while self.active:
-			conn, addr = server.accept() # loop stalls on this until new connection
-			self.connections.append(conn)
-			client_thread = threading.Thread(target=self.handle_client, args=(addr, conn))
-			client_thread.start()
+			try:
+				conn, addr = server.accept() # loop stalls on this until new connection
+				self.connections.append(conn)
+				client_thread = threading.Thread(target=self.handle_client, args=(addr, conn))
+				client_thread.start()
+			except socket.error as e:
+				print ("Passed server.accept()")
 
 		server.close()
+		print ("Closed Server")
+		client_thread.join()
 
 	# Get the information return validity of received information
 	def receive_action(self, conn):
@@ -57,7 +63,7 @@ class Server:
 		try:
 			json = conn.recv(4096)
 		except socket.timeout:
-			print ("Timed out")
+			print ("Server Timed out")
 		except KeyboardInterrupt:
 			conn.close()
 		if (json != None):
@@ -79,8 +85,8 @@ class Server:
 			conn.send(self.response)
 
 	# Allow server shutdown
-	def set_active_status(state):
-		self.active = state
+	def shutdown(self):
+		self.active = False
 
 	# Customize timeout
 	def set_receive_timout(self, timeout):
@@ -95,6 +101,7 @@ class Server:
 
 		self.connections.remove(conn)
 		conn.close()
+		print ("Handle Client Closed Connection")
 
 	# allow for custom rules to be added for verify_action()
 	def add_rule(self, func):
