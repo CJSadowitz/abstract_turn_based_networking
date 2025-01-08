@@ -11,7 +11,7 @@ import socket
 import threading
 
 class Server:
-	def __init__(self, ip="127.0.0.1", port=53849, timeout=0.1):
+	def __init__(self, ip="127.0.0.1", port=53849, timeout=1):
 		self.ip = ip
 		self.port = port
 
@@ -39,13 +39,12 @@ class Server:
 			print ("Failed to bind socket: " + str(e))
 			return
 
-		server.settimeout(self.timeout)
 		server.listen()
 
 		while self.active:
 			conn, addr = server.accept() # loop stalls on this until new connection
 			self.connections.append(conn)
-			client_thread = threading.Thread(self.handle_client, args=(conn, addr,))
+			client_thread = threading.Thread(target=self.handle_client, args=(addr, conn))
 			client_thread.start()
 
 		server.close()
@@ -53,7 +52,14 @@ class Server:
 	# Get the information return validity of received information
 	def receive_action(self, conn):
 		json = None
-		json = conn.recv(4096) # do time out
+		# do timeout
+		conn.settimeout(self.timeout)
+		try:
+			json = conn.recv(4096)
+		except socket.timeout:
+			print ("Timed out")
+		except KeyboardInterrupt:
+			conn.close()
 		if (json != None):
 			for rule in self.rules:
 				if (self.verify_action(rule, json) == False):
@@ -73,8 +79,8 @@ class Server:
 			conn.send(self.response)
 
 	# Allow server shutdown
-	def set_server_activity(switch):
-		self.active = switch
+	def set_active_status(state):
+		self.active = state
 
 	# Customize timeout
 	def set_receive_timout(self, timeout):
@@ -100,7 +106,7 @@ class Server:
 		else:
 			self.response = self.game_state_func(json)
 
-	def convert_game_state_func(func)
+	def convert_game_state_func(func):
 		self.game_state_func = func
 
 
