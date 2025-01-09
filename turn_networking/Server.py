@@ -9,6 +9,7 @@ Send Turn Permission
 
 import socket
 import threading
+import time
 
 class Server:
 	def __init__(self, ip="127.0.0.1", port=53849, timeout=1):
@@ -44,7 +45,7 @@ class Server:
 
 		while self.active:
 			try:
-				conn, addr = server.accept() # loop stalls on this until new connection
+				conn, addr = server.accept()
 				self.connections.append(conn)
 				client_thread = threading.Thread(target=self.handle_client, args=(addr, conn))
 				client_thread.start()
@@ -60,7 +61,7 @@ class Server:
 		# do timeout
 		conn.settimeout(self.timeout)
 		try:
-			json = conn.recv(4096)
+			json = conn.recv(4096).decode("utf-8")
 		except socket.timeout: # add throw
 			pass
 		except KeyboardInterrupt:
@@ -81,7 +82,7 @@ class Server:
 	# send message to all connections
 	def relay_action(self):
 		for conn in self.connections:
-			conn.send(self.response)
+			conn.send(self.response.encode("utf-8"))
 
 	# Allow server shutdown
 	def shutdown(self):
@@ -114,7 +115,16 @@ class Server:
 	def convert_game_state_func(func):
 		self.game_state_func = func
 
+	# Customize message to include lobby name? Or could just be user name of host
+	def broadcast_lobby(self):
+		# Port should a: be customizable, b: consitant across server instances
+		broadcast_address = (self.ip, 5000)
+		message = f"{self.ip}:{self.port}".encode("utf-8")
 
-if __name__ == "__main__":
-	server = Server(timeout=1)
-	server.create_lobby(4)
+		broadcast_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		broadcast_server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+		# Turn off after all players have joined?
+		while self.active:
+			broadcast_server.sendto(message, broadcast_address)
+			time.sleep(5)

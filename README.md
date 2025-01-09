@@ -21,12 +21,13 @@ Functions:
 ### Setup
 Import Modules: `from Server import Server` and `from Client import Client` </br>
 ### Server
-** Reorder the functions for user called functions and server called functions ** </br>
+**Reorder the functions for user called functions and server called functions** </br>
 Server is a class that you create an object of to run: </br>
 Constructor: `s = Server(ip, port, timeout)` </br>
 Functions:
 - `s.add_rule(function)` </br>
 Each function will be added to a list that is ran through verify_action function </br>
+The rule function *must* return a bool true or false </br>
 - `s.verify_action(rule, json)` </br>
 A function that is automatically called by the server to check the validity of the json WRT the rule function </br>
 - `s.set_receive_timeout` </br>
@@ -48,10 +49,10 @@ Handles client connection and thread creation for each client </br>
 - `s.handle_client(ip, connection)` </br>
 Server Handles receiving information and relaying valid information to other clients </br>
 ### Client
-** Reoder for order of user called functions ** </br>
+**Reoder for order of user called functions** </br>
 Constructor: `c = Client(timeout)` </br>
 Functions:
-- `c.discover_lobbies()` ** Still need to make this function ** </br>
+- `c.discover_lobbies()` **Still need to make this function** </br>
 Returns list of ip and port numbers </br>
 - `c.join_lobby(ip, port)` </br>
 Main loop of client thread: </br>

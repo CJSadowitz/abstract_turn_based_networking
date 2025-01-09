@@ -8,14 +8,17 @@ Discover Lobbies
 """
 
 import socket
+import time
 
 class Client:
 	def __init__(self, timeout=1):
 		self.timeout = timeout
 		self.active = False
-
 		self.message = None
 		self.game_state = None
+		self.discover_active = False
+
+		self.lobbies = []
 
 	# Main loop
 	def join_lobby(self, ip="127.0.0.1", port=53850):
@@ -32,15 +35,11 @@ class Client:
 
 		while self.active:
 			if self.message != None:
-				client.send(self.message.encode())
+				client.send(self.message.encode("utf-8"))
 				self.message = None
 			self.receive_action(client)
 
 		client.close()
-
-	# returns all discovered ip's broadcasting information
-	def discover_lobbies(self):
-		pass
 
 	# send json to the server for processing
 	def set_message(self, json):
@@ -50,7 +49,7 @@ class Client:
 	def receive_action(self, client):
 		client.settimeout(self.timeout) # Consider moving this for efficiency?
 		try:
-			client.recv(4096)
+			self.game_state = client.recv(4096).decode("utf-8")
 		except socket.timeout:
 			pass # Maybe change this to a throw such that the user can handle this?
 		except KeyboardInterrupt:
@@ -66,5 +65,22 @@ class Client:
 	def shutdown(self):
 		self.active = False
 
-if __name__ == "__main__":
-	pass
+	def shutdown_discover(self):
+		self.discover_active = False
+
+	# Port should be same but customizable
+	def discover_lobbies(self):
+		self.discover_active = True
+
+		discover = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		discover.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+		discover.bind(("", 5000))
+
+		while self.discover_active:
+			data, addr = discover.recvfrom(1024)
+			lobby = data.decode("utf-8")
+			if lobby in self.lobbies:
+				continue
+			else
+				self.lobbies.append(lobby)
+			time.sleep(5)
