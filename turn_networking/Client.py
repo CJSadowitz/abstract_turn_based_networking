@@ -81,6 +81,6 @@ class Client:
 			lobby = data.decode("utf-8")
 			if lobby in self.lobbies:
 				continue
-			else
+			else:
 				self.lobbies.append(lobby)
 			time.sleep(5)
