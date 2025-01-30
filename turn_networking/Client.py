@@ -21,7 +21,7 @@ class Client:
 		self.lobbies = []
 
 	# Main loop
-	def join_lobby(self, ip="127.0.0.1", port=53850):
+	def join_lobby(self, ip="127.0.0.1", port=53849):
 		try:
 			client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		except socket.error as e: # add a throw here too?

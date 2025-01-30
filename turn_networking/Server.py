@@ -22,7 +22,7 @@ class Server:
 		self.timeout = timeout
 
 		self.active = False
-		self.respone = None
+		self.response = None
 		self.game_state_func = None
 
 	# main loop
@@ -77,6 +77,8 @@ class Server:
 
 	# Rule will be a function that the json will be fed into
 	def verify_action(self, rule, json):
+		print (json)
+		print (rule(json))
 		return rule(json)
 
 	# send message to all connections
@@ -95,9 +97,11 @@ class Server:
 	# handle receive and relay of messages
 	def handle_client(self, ip, conn):
 		while self.active:
-			if (self.receive_action(conn) and self.response != None): # returns false if not recieved or invalid response
-				self.relay_action() # tell all connections the move
-				self.reponse = None
+			#if (self.receive_action(conn) and self.response != None): # returns false if not recieved or invalid response
+			#	self.relay_action() # tell all connections the move
+			# 	self.reponse = None
+			self.make_game_state()
+			self.replay_action()
 
 		self.connections.remove(conn)
 		conn.close()
@@ -112,7 +116,7 @@ class Server:
 		else:
 			self.response = self.game_state_func(json)
 
-	def convert_game_state_func(func):
+	def convert_game_state_func(self, func):
 		self.game_state_func = func
 
 	# Customize message to include lobby name? Or could just be user name of host
