@@ -78,11 +78,15 @@ class Server:
 	# Rule will be a function that the json will be fed into
 	def verify_action(self, rule, json):
 		print (json)
-		print (rule(json))
-		return rule(json)
+		try:
+			return rule(json)
+		except Exception as e: # Definitly not how you are supposed to do it
+			return False
 
 	# send message to all connections
 	def relay_action(self):
+		if self.response == None:
+			return
 		for conn in self.connections:
 			conn.send(self.response.encode("utf-8"))
 
@@ -100,8 +104,8 @@ class Server:
 			#if (self.receive_action(conn) and self.response != None): # returns false if not recieved or invalid response
 			#	self.relay_action() # tell all connections the move
 			# 	self.reponse = None
-			self.make_game_state()
-			self.replay_action()
+			self.receive_action(conn)
+			self.relay_action()
 
 		self.connections.remove(conn)
 		conn.close()
@@ -111,10 +115,8 @@ class Server:
 		self.rules.append(func)
 
 	def make_game_state(self, json):
-		if self.game_state_func == None:
-			self.response = json
-		else:
-			self.response = self.game_state_func(json)
+		function = self.game_state_func
+		self.response = function()
 
 	def convert_game_state_func(self, func):
 		self.game_state_func = func
