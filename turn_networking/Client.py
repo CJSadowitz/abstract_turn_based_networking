@@ -50,7 +50,7 @@ class Client:
 		client.settimeout(self.timeout) # Consider moving this for efficiency?
 		try:
 			self.game_state = client.recv(4096).decode("utf-8")
-			print ("CLIENT: ", self.game_state)
+			print ("CLIENT:",self.game_state)
 		except socket.timeout:
 			pass # Maybe change this to a throw such that the user can handle this?
 		except KeyboardInterrupt:

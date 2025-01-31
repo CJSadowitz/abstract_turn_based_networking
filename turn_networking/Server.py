@@ -77,7 +77,7 @@ class Server:
 
 	# Rule will be a function that the json will be fed into
 	def verify_action(self, rule, json):
-		print (json)
+		print (rule(json))
 		try:
 			return rule(json)
 		except Exception as e: # Definitly not how you are supposed to do it
@@ -85,6 +85,8 @@ class Server:
 
 	# send message to all connections
 	def relay_action(self):
+		json = None
+		self.make_game_state(json)
 		if self.response == None:
 			return
 		for conn in self.connections:
